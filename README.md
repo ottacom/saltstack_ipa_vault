@@ -3,12 +3,12 @@
 This module enables saltsack to retieve secrets from Free Ipa vault 
 
 ## How it works
-
+<p align="center">![alt text](https://github.com/ottacom/saltstack_ipa_vault/blob/main/Workflow.drawio.png)</p>
 
 
 ## Key features
 
-# Prerequisties
+## Prerequisties
 - FreeIpa + Vault extension enabled
 - Gpg  
 
