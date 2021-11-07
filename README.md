@@ -1,9 +1,21 @@
 
-# Saltstack_ipa_vault
-Saltstack module to retrieve and  store secret using FreeIpa vault
-![alt text](https://github.com/ottacom/saltstack_ipa_vault/blob/main/saltstack_ipa_valt.drawio.png)
+# Saltstack - FreeIpa Vault module integration
+This module enables saltsack to retieve secrets from Free Ipa vault 
 
 ## How it works
+
+
+
+## Key features
+
+# Prerequisties
+- FreeIpa + Vault extension enabled
+- Gpg  
+
+![alt text](https://github.com/ottacom/saltstack_ipa_vault/blob/main/saltstack_ipa_valt.drawio.png)
+
+
+
 
 
 
