@@ -39,7 +39,7 @@ Deploy this module only on the salt-stack master ONLY, running everything from t
 
 ### Scenario B (Half decentralized): 
 Deploy the module on every minions which are enrolled into FreeIpa and able to retrieve/store the secret.
-Minions are not holding the GPG KEYS so you have to decrypt and pass the info stored into the pillar (ipa service account,passowrd,password vault) from the Salt stack master to the minion, then the it will ask the secret to FreeIpa vault, again you need to "orchestrate" since multiple hosts are involved.
+Minions are not holding the GPG KEYS so you have to decrypt and pass the info stored into the pillar (ipa service account,passowrd,password vault) from the Salt stack master to the minion, then it will ask the secret to FreeIpa vault, again you need to "orchestrate" since multiple hosts are involved.
 ![alt text](https://github.com/ottacom/saltstack_ipa_vault/blob/main/doc/B_saltstack_ipa_valt.drawio.png)
 
 ### Scenario B (Total decentralized): 
