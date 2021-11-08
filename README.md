@@ -55,14 +55,14 @@ ipa_vault.retrieve:
 When you run this module, the Salt stack master will use a secure pillar to retrieve the credentials in order to get access to FreeIPA(1)
 Once the secret will be retrieved/stored into FreeIPA (2) You can continue your job as usual (3).
 
-# Security inforamtions
-In order to decrypt the secret there are some (I guess it's good enough:-) conditions to sotisfy:
-- The Salt-stack master or minion (it depends from your setup) must me enrolled into FreeIpa
-- You need a service account which has a view on the FreeIpa Vault
-- Every single secret into FreeIpa Vault is stored with a password
-- The credetntials stored into the pillar file are encrypted with GPG
-- The GPG key used to encrypt the pillar (AKA secure pillar) is protected by a password
-- The module is obfuscated by pyarmor
+# Focused on the security
+In order to decrypt the secret there are at least 6 conditions to satisfy (I guess it's good enough:-) :
+1.  The Salt-stack master or minion (it depends on your setup) must be enrolled into FreeIpa
+2.  You need a service account who has a view on the FreeIpa Vault and only the secrets which are really necessary
+3.  Every single secret into FreeIpa Vault is stored with a password even if you are the owner of the secret, a password will be requested 
+4.  The credentials stored in the pillar file are encrypted with GPG
+5.  The GPG key used to encrypt the pillar (AKA secure pillar) is protected by a password
+6.  The module is obfuscated by armor
 
 
 
