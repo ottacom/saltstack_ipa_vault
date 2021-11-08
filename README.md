@@ -21,7 +21,9 @@ salt-call ipa_vault.store root_password_vm "MySup3@$sec!#et"
 
 ## To store a secret into FreeIpa Vault in a shared way
 
-salt-call ipa_vault.store_shared  `<your secret vault stored into FreeIpa> <secret> <groupname(optional)>`
+salt-call ipa_vault.store_shared  `<your secret vault name> <secret> <groupname(optional)>`
+
+
 
 ```bash 
 salt-call ipa_vault.store root_password_vm "MySup3@$sec!#et" admin-group
