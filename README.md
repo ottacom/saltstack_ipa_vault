@@ -68,11 +68,11 @@ mkdir -p
 gpg --gen-key --homedir /etc/salt/gpgkeys
 
 Please follow the instructions
-!!!!REMEMBER TO SET A PASSWORD TO USE THE KEY!!!
+!!!!REMEMBER TO SET A PASSWORD TO LOCK THE KEY!!!
 ```
-
-### Important:
+### Trick:
 If gpg command it dosen't work plese consider to install and use gpg1 instead
+
 
 
 
@@ -90,7 +90,7 @@ salt-call ipa_vault.store root_password_vm "MySup3@$sec!#et"
 ### To store a secret into FreeIpa Vault in a shared way
 salt-call ipa_vault.store_shared  `<your secret vault name> <secret> <groupname(optional)>`
 ```bash 
-salt-call ipa_vault.store root_password_vm "MySup3@$sec!#et" admin-group
+salt-call ipa_vault.store_shared root_password_vm "MySup3@$sec!#et" admin-group
 ```
 ### To store secret using state file 
 store.sls
