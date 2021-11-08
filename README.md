@@ -42,7 +42,7 @@ ipa_vault_store_sec:
      - vault_name: test123
      - secret: "Supermega!secrte#%$"
      - overwrite: True
-     - group_member: ngc-sdm
+     - group_member: mygorup
 ```
 ## To retrieve secret using state file 
 retrieve.sls
@@ -58,16 +58,11 @@ ipa_vault.retrieve:
 ![alt text](https://github.com/ottacom/saltstack_ipa_vault/blob/main/doc/Workflow.drawio.png)
 
 
-## Key features
-
 ## Prerequisties
 - FreeIpa + Vault extension enabled
 - Gpg  
 
 ![alt text](https://github.com/ottacom/saltstack_ipa_vault/blob/main/doc/saltstack_ipa_valt.drawio.png)
-
-
-
 
 
 
