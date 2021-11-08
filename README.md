@@ -48,7 +48,33 @@ Deploy the module and distribute the GPG KEYS on every minion who is enrolled, e
 ![alt text](https://github.com/ottacom/saltstack_ipa_vault/blob/main/doc/C_saltstack_ipa_valt.drawio.png)
 
 
- 
+
+### Software Prerequisties
+- Python3 
+- FreeIpa + Vault required (https://www.freeipa.org/page/V4/Password_Vault_2.)
+- GPG Installed (Ubuntu: apt install gnupg RockyLinux,Centos,RH: yum install gnupg, yum install gnupg1 )
+- Salt stack master installed (https://docs.saltproject.io/en/latest/topics/installation/index.html)
+- Salt stack MUST be enrolled into freeipa (minions is optional it depends for your scenario)
+- Pyarmor https://pypi.org/project/pyarmor/  - pip install pyarmor
+
+# Installation
+
+### Install GPG 
+
+```bash
+mkdir -p /etc/salt/gpgkeys
+chmod 0700 /etc/salt/gpgkeys
+mkdir -p 
+gpg --gen-key --homedir /etc/salt/gpgkeys
+
+Please follow the instructions
+!!!!REMEMBER TO SET A PASSWORD TO USE THE KEY!!!
+```
+
+### Important:
+If gpg command it dosen't work plese consider to install and use gpg1 instead
+
+
 
 # How to use it
 ### To retieve a secret from FreeIpa Vault
@@ -99,21 +125,6 @@ ipa_vault.retrieve:
 
 
 
-### Software Prerequisties
-- Python3 
-- FreeIpa + Vault required (https://www.freeipa.org/page/V4/Password_Vault_2.)
-- GPG Installed (Ubuntu: apt install gnupg RockyLinux,Centos,RH: yum install gnupg, yum install gnupg1 )
-- Salt stack master installed (https://docs.saltproject.io/en/latest/topics/installation/index.html)
-- Salt stack MUST be enrolled into freeipa (minions is optional it depends for your scenario)
-- Pyarmor https://pypi.org/project/pyarmor/  - pip install pyarmor
-
-
-
-
-### Installation
-
-
-```
 
 ### Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
