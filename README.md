@@ -1,7 +1,8 @@
 
 # Saltstack & FreeIpa Vault module integration
-!<img align="center" src="https://github.com/ottacom/saltstack_ipa_vault/blob/main/doc/banner.drawio.png">
-
+<p align="center">
+<img src="https://github.com/ottacom/saltstack_ipa_vault/blob/main/doc/banner.drawio.png"
+</p>
 This module enables saltsack to manage secrets on Free Ipa vault reaching a very high grade of security combining  multiple tecnologies togheter as GPG , Free Ipa Vault, SaltStack and pyarmor
 
 # How it works
