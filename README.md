@@ -51,6 +51,7 @@ ipa_vault.retrieve:
 
 # How it works
 ![alt text](https://github.com/ottacom/saltstack_ipa_vault/blob/main/doc/Workflow.drawio.png)
+
 When you run this module, the Salt stack master will use a secure pillar to retrieve the credentials in order to get access to FreeIPA(1)
 Once the secret will be retrieved/stored into FreeIPA (2) You can continue your job as usual (3).
 
