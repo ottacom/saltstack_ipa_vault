@@ -2,6 +2,48 @@
 # Saltstack - FreeIpa Vault module integration
 This module enables saltsack to retieve secrets from Free Ipa vault
 
+# How it works
+![alt text](https://github.com/ottacom/saltstack_ipa_vault/blob/main/doc/Workflow.drawio.png)
+
+When you run this module, the Salt stack master will use a secure pillar to retrieve the credentials in order to get access to FreeIPA(1)
+Once the secret will be retrieved/stored into FreeIPA (2) You can continue your job as usual (3).
+
+# Focused on the security
+In order to decrypt the secret there are at least 6 conditions to satisfy (I guess it's good enough:-) :
+1.  The Salt-stack master or minion (it depends on your setup) must be enrolled into FreeIpa
+2.  You need a service account who has a view on the FreeIpa Vault 
+3.  Every single secret into FreeIpa Vault is stored with a password even if you are the owner of the secret a password will be requested to use the secret
+4.  The credentials stored in the pillar file are encrypted with GPG
+5.  The GPG key used to encrypt the pillar (AKA secure pillar) is protected by a password
+6.  The module contains the password to unlock the GPG key but the code is obfuscated by **pyarmor** we don't want to expose the Key in a flat file like something.conf
+
+
+
+### Remind:
+The module is obfuscated, by **pyarmor** this is the last chance to protect the GPG PASSWORD in case someone can see the file, but this it doesn't mean that reverse engineering can be performed on the file 
+
+# Things know and best practices 
+
+- FreeIpa module will log all the activities into SYSLOG
+- Ipa module is using GPG to decode the pillar file which contains credentials to get access on FreeIpa and decode the secrets, the GPG key must be protected by a password which is hardcoded into the module, the module MUST be obfuscated usning pyarmor
+- There are many ways to implement a secure env to manage  considering usability and security , this module can be used at leas
+    
+## Some best practices
+
+Please consider always to expose only the secrets that you really need to perform the necessary operations, using multiple service accounts is strongly recommended 
+
+### Scenario A (Centralized): 
+Deploy this module only on the salt-stack master, running everything from the salt-stack master to retireve the secrets. You should use "orchestrate" to apply the satefile, retrieving the secret on the saltmaster and do the job on the hosts.
+![alt text](https://github.com/ottacom/saltstack_ipa_vault/blob/main/doc/saltstack_ipa_valt.drawio.png)
+
+### Scenario B (Half Decentrilized): 
+Deploy the module on every minions which are enrolled into FreeIpa and able to retrieve/store the secret.
+Minions are not holding the GPG KEY so you have to decrypt and pass the info stored into the pillar (ipa service account,passowrd,password vault) from the Salt stack master to the minion, then the it will ask the secret to FreeIpa vault, again you need to "orchestrate" since multiple hosts are involved.
+![alt text](https://github.com/ottacom/saltstack_ipa_vault/blob/main/doc/B_saltstack_ipa_valt.drawio.png)
+
+
+ 
+
 # How to use it
 ### To retieve a secret from FreeIpa Vault
 salt-call ipa_vault.retrieve  `<your secret vault stored into FreeIpa>`
@@ -49,35 +91,6 @@ ipa_vault.retrieve:
 ```
 
 
-# How it works
-![alt text](https://github.com/ottacom/saltstack_ipa_vault/blob/main/doc/Workflow.drawio.png)
-
-When you run this module, the Salt stack master will use a secure pillar to retrieve the credentials in order to get access to FreeIPA(1)
-Once the secret will be retrieved/stored into FreeIPA (2) You can continue your job as usual (3).
-
-# Focused on the security
-In order to decrypt the secret there are at least 6 conditions to satisfy (I guess it's good enough:-) :
-1.  The Salt-stack master or minion (it depends on your setup) must be enrolled into FreeIpa
-2.  You need a service account who has a view on the FreeIpa Vault and only the secrets which are really necessary
-3.  Every single secret into FreeIpa Vault is stored with a password even if you are the owner of the secret, a password will be requested 
-4.  The credentials stored in the pillar file are encrypted with GPG
-5.  The GPG key used to encrypt the pillar (AKA secure pillar) is protected by a password
-6.  The module is obfuscated by armor
-
-
-
-Good to know:
-- FreeIpa module will log all the activities into SYSLOG
-- Some best practices: 
-    Scenario A: Deploy this module only on the salt-stack master, running everything from the salt-stack master to manage the secrets. You should use "orchestrate" to apply the satefile, retrieving the secret on the saltmaster and do the job on the hosts
-    Scenario B: Deploy this module only on eve
-     of course you can also suppose to use this module on minions but remember that the minion MUST be enrolled into FreeIpa to retireve/store the secret
-- Ipa module is using GPG to decode the pillar file which contains credentials to get access on FreeIpa and decode the secrets, the GPG key must be protected by a password which is hardcoded into the module, the module MUST be obfuscated usning pyarmor
-- There are many ways to implement a secure env considering usability and security , this module can be used at leas
-    1.
-
-
-
 
 
 ### Software Prerequisties
@@ -86,7 +99,6 @@ Good to know:
 - Salt stack master installed (https://docs.saltproject.io/en/latest/topics/installation/index.html)
 - Salt stack maste MUST be enrolled into freeipa (minions is optional)
   
-![alt text](https://github.com/ottacom/saltstack_ipa_vault/blob/main/doc/saltstack_ipa_valt.drawio.png)
 
 
 
