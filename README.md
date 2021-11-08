@@ -33,8 +33,8 @@ ipa_vault_store_sec:
      - secret: "Supermega!secrte#%$"
      - overwrite: True
 ```
-## To store secret using state file 
-store.sls
+## To store secret using state file (shared) 
+store_shared.sls
 ```
 ipa_vault_store_sec:
   module.run:
