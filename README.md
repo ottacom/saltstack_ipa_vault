@@ -34,7 +34,7 @@ The module is obfuscated by **pyarmor** this is the last chance to protect the G
 - Please consider always to expose only the secrets that you really need to perform the necessary operations, using multiple service accounts is strongly recommended. 
 
 ### Scenario A (Centralized): 
-Deploy this module only on the salt-stack master, running everything from the salt-stack master to retireve the secrets. You should use "orchestrate" to apply the satefile, retrieving the secret on the saltmaster and do the job on the hosts.
+Deploy this module only on the salt-stack master ONLY, running everything from the salt-stack master to retireve the secrets. You should use "orchestrate" to apply the satefile, retrieving the secret on the saltmaster and do the job on the hosts.
 ![alt text](https://github.com/ottacom/saltstack_ipa_vault/blob/main/doc/saltstack_ipa_valt.drawio.png)
 
 ### Scenario B (Half decentralized): 
