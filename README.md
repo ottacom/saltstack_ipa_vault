@@ -107,7 +107,7 @@ store_shared.sls
 ```
 ipa_vault_store_sec:
   module.run:
-     - name: ipa_vault.store
+     - name: ipa_vault.store_shared
      - vault_name: test123
      - secret: "Supermega!secrte#%$"
      - overwrite: True
