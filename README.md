@@ -42,8 +42,8 @@ Deploy the module on every minions which are enrolled into FreeIpa and able to r
 Minions are not holding the GPG KEYS so you have to decrypt and pass the info stored into the pillar (ipa service account,passowrd,password vault) from the Salt stack master to the minion, then it will ask the secret to FreeIpa vault, again you need to "orchestrate" since multiple hosts are involved.
 ![alt text](https://github.com/ottacom/saltstack_ipa_vault/blob/main/doc/B_saltstack_ipa_valt.drawio.png)
 
-### Scenario B (Total decentralized): 
-Deploy the module and distribute the GPG KEYS on every minion who is enrolled, every single minion will be able to get the secret from FreeIPA, you don't need to "orchestrate" since no multipe host are involved, just the minion
+### Scenario C (Total decentralized): 
+Deploy the module and distribute the GPG KEYS on every minion who is enrolled, every single minion will be able to get the secret from FreeIPA, you don't need to "orchestrate" since no multipe hosts are involved but just the minion
 
 ![alt text](https://github.com/ottacom/saltstack_ipa_vault/blob/main/doc/C_saltstack_ipa_valt.drawio.png)
 
@@ -100,35 +100,19 @@ ipa_vault.retrieve:
 
 
 ### Software Prerequisties
+- Python3 
 - FreeIpa + Vault required (https://www.freeipa.org/page/V4/Password_Vault_2.)
 - GPG Installed (Ubuntu: apt install gnupg RockyLinux,Centos,RH: yum install gnupg, yum install gnupg1 )
 - Salt stack master installed (https://docs.saltproject.io/en/latest/topics/installation/index.html)
-- Salt stack maste MUST be enrolled into freeipa (minions is optional)
-  
+- Salt stack MUST be enrolled into freeipa (minions is optional it depends for your scenario)
+- Pyarmor https://pypi.org/project/pyarmor/  - pip install pyarmor
+
 
 
 
 ### Installation
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install foobar.
 
-```bash
-pip install foobar
-```
-
-### Usage
-
-```python
-import foobar
-
-# returns 'words'
-foobar.pluralize('word')
-
-# returns 'geese'
-foobar.pluralize('goose')
-
-# returns 'phenomenon'
-foobar.singularize('phenomena')
 ```
 
 ### Contributing
