@@ -56,14 +56,14 @@ When you run this module, the Salt stack master will use a secure pillar to retr
 Once the secret will be retrieved/stored into FreeIPA (2) You can continue your job as usual (3).
 
 # Security inforamtions
-So in order to decrypt the secret there are some:-) conditions to sotisfy:
+In order to decrypt the secret there are some (I guess is good enough:-) conditions to sotisfy:
 - The Salt-stack master or minion (it depends from your setup) must me enrolled into FreeIpa
 - You need a service account which has a view on the FreeIpa Vault
 - Every single secret into FreeIpa Vault is stored with a password
 - The credetntials stored into the pillar file are encrypted with GPG
 - The GPG key used to encrypt the pillar (AKA secure pillar) is protected by a password
 - The module is obfuscated by pyarmor
-I guess is good enough
+
 
 
 Good to know:
