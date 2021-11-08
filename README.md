@@ -56,7 +56,7 @@ When you run this module, the Salt stack master will use a secure pillar to retr
 Once the secret will be retrieved/stored into FreeIPA (2) You can continue your job as usual (3).
 
 # Security inforamtions
-In order to decrypt the secret there are some (I guess is good enough:-) conditions to sotisfy:
+In order to decrypt the secret there are some (I guess it's good enough:-) conditions to sotisfy:
 - The Salt-stack master or minion (it depends from your setup) must me enrolled into FreeIpa
 - You need a service account which has a view on the FreeIpa Vault
 - Every single secret into FreeIpa Vault is stored with a password
