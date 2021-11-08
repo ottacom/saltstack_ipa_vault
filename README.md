@@ -2,16 +2,16 @@
 # Saltstack - FreeIpa Vault module integration
 This module enables saltsack to retieve secrets from Free Ipa vault
 
-## How to use it
+# How to use it
 
-# To retieve a secret from FreeIpa Vault
+## To retieve a secret from FreeIpa Vault
 salt-call ipa_vault.retrieve  `<your secret vault stored into FreeIpa>`
 
 ```bash 
 salt-call ipa_vault.retrieve root_password_vm
 ```
 
-# To store a secret into FreeIpa Vault
+## To store a secret into FreeIpa Vault
 
 salt-call ipa_vault.store  `<your secret vault stored into FreeIpa> <secret>`
 
@@ -19,7 +19,7 @@ salt-call ipa_vault.store  `<your secret vault stored into FreeIpa> <secret>`
 salt-call ipa_vault.store root_password_vm "MySup3@$sec!#et"
 ```
 
-# To store a secret into FreeIpa Vault in a shared way
+## To store a secret into FreeIpa Vault in a shared way
 
 salt-call ipa_vault.store_shared  `<your secret vault stored into FreeIpa> <secret> <groupname(optional)>`
 
