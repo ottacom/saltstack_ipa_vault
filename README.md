@@ -10,7 +10,7 @@ This module enables saltsack to manage secrets on Free Ipa vault reaching a very
 When you run this module, the Salt stack master will use a secure pillar to retrieve the credentials in order to get access to FreeIPA(1)
 Once the secret will be retrieved/stored into FreeIPA (2) You can continue your job as usual (3).
 ### Important:
-***We are not going to configure PGP WITHOUT protecting the PGP key with a password as suggested by the standard configuration  from the salt-stack doc https://docs.saltproject.io/en/latest/ref/renderers/all/salt.renderers.gpg.html***
+***We are not going to configure PGP WITHOUT protecting the PGP key with a password like  the standard configuration  suggested from the salt-stack doc https://docs.saltproject.io/en/latest/ref/renderers/all/salt.renderers.gpg.html***
 
 # Focused on the security
 In order to decrypt the secret there are at least 6 conditions to satisfy (I guess it's good enough:-) :
@@ -24,17 +24,14 @@ In order to decrypt the secret there are at least 6 conditions to satisfy (I gue
 
 
 ### Remind:
-The module is obfuscated, by **pyarmor** this is the last chance to protect the GPG PASSWORD in case someone can see the file, but this it doesn't mean that reverse engineering can be performed on the file 
+The module is obfuscated by **pyarmor** this is the last chance to protect the GPG PASSWORD in case someone can see the file, but  it doesn't mean that reverse engineering can't be performed on the file. 
 
 # Things to know and best practices 
 
 - FreeIpa module will log all the activities into SYSLOG
 - Ipa module is using GPG to decode the pillar file which contains credentials to get access on FreeIpa and decode the secrets, the GPG key must be protected by a password which is hardcoded into the module, the module MUST be obfuscated usning pyarmor
-- There are many ways to implement a secure env to manage  considering usability and security , this module can be used at leas
-    
-## Some best practices
-
-Please consider always to expose only the secrets that you really need to perform the necessary operations, using multiple service accounts is strongly recommended 
+- There are many ways to implement a secure env to manage secrets considering usability and security , this module can be used at least in 3 different scenarios.
+- Please consider always to expose only the secrets that you really need to perform the necessary operations, using multiple service accounts is strongly recommended. 
 
 ### Scenario A (Centralized): 
 Deploy this module only on the salt-stack master, running everything from the salt-stack master to retireve the secrets. You should use "orchestrate" to apply the satefile, retrieving the secret on the saltmaster and do the job on the hosts.
