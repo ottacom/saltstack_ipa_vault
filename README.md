@@ -6,7 +6,6 @@ This module enables saltsack to retieve secrets from Free Ipa vault
 
 ## To retieve a secret from FreeIpa Vault
 salt-call ipa_vault.retrieve  `<your secret vault stored into FreeIpa>`
-
 ```bash 
 salt-call ipa_vault.retrieve root_password_vm
 ```
@@ -14,7 +13,6 @@ salt-call ipa_vault.retrieve root_password_vm
 ## To store a secret into FreeIpa Vault
 
 salt-call ipa_vault.store  `<your secret vault stored into FreeIpa> <secret>`
-
 ```bash 
 salt-call ipa_vault.store root_password_vm "MySup3@$sec!#et"
 ```
@@ -22,16 +20,41 @@ salt-call ipa_vault.store root_password_vm "MySup3@$sec!#et"
 ## To store a secret into FreeIpa Vault in a shared way
 
 salt-call ipa_vault.store_shared  `<your secret vault name> <secret> <groupname(optional)>`
-
-
-
 ```bash 
 salt-call ipa_vault.store root_password_vm "MySup3@$sec!#et" admin-group
 ```
+## To store secret using state file 
+store.sls
+```
+ipa_vault_store_sec:
+  module.run:
+     - name: ipa_vault.store
+     - vault_name: test123
+     - secret: "Supermega!secrte#%$"
+     - overwrite: True
+```
+## To store secret using state file 
+store.sls
+```
+ipa_vault_store_sec:
+  module.run:
+     - name: ipa_vault.store
+     - vault_name: test123
+     - secret: "Supermega!secrte#%$"
+     - overwrite: True
+     - group_member: ngc-sdm
+```
+## To retrieve secret using state file 
+retrieve.sls
+```
+ipa_vault.retrieve:
+  module.run:
+     - name: ipa_vault.retrieve
+     - secret: test123
+```
 
 
-
-## How it works
+# How it works
 ![alt text](https://github.com/ottacom/saltstack_ipa_vault/blob/main/doc/Workflow.drawio.png)
 
 
