@@ -9,6 +9,8 @@ This module enables saltsack to manage secrets on Free Ipa vault reaching a very
 
 When you run this module, the Salt stack master will use a secure pillar to retrieve the credentials in order to get access to FreeIPA(1)
 Once the secret will be retrieved/stored into FreeIPA (2) You can continue your job as usual (3).
+### Important:
+***We are not configuring GPG WITHOUT protecting the key with a password using the standard configuration suggested by the salt-stack doc https://docs.saltproject.io/en/latest/ref/renderers/all/salt.renderers.gpg.html***
 
 # Focused on the security
 In order to decrypt the secret there are at least 6 conditions to satisfy (I guess it's good enough:-) :
