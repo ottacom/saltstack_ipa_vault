@@ -12,7 +12,7 @@ Once the secret will be retrieved/stored into FreeIPA (2) You can continue your 
 ### Important:
 ***We are not going to configure PGP WITHOUT protecting the PGP key with a password like  the standard configuration  suggested from the salt-stack doc https://docs.saltproject.io/en/latest/ref/renderers/all/salt.renderers.gpg.html***
 
-# Focused on the security
+# Focus on the security
 In order to decrypt the secret there are at least 6 conditions to satisfy (I guess it's good enough:-) :
 1.  The Salt-stack master or minion (it depends on your setup) must be enrolled into FreeIpa
 2.  You need a service account who has a view on the FreeIpa Vault 
@@ -100,7 +100,7 @@ gpg --list-keys  --homedir /etc/salt/gpgkeys
 #Please remember your GPG password 
 ```
 
-The open the the file source/ipa_vault.py and configure the beginning of the file in this way then deploy and install the module in the way that you prefer.
+Then open the the file source/ipa_vault.py and configure the beginning of the file in this way , deploy and install the module in the way that you prefer.
 
 ```python
 # this is a pointer to the module object instance itself.
@@ -222,14 +222,21 @@ ipa_vault.retrieve:
      - secret: test123
 ```
 
+## Obfuscating the module (strongly reccomended)
+```bash
+cd /saltstack_ipa_vault/_modules
+pyarmor obfuscate ipa_vault.py
+cd dist
+mv * ../
+salt '<name of your salt master>' saltutil.clear_cache
+salt 'saltmaster.opr.ngc.dk' saltutil.clear_cache
+salt '<name of your salt master>' saltutil.sync_all
+```
 
-
-
-
-### Contributing
+## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
 Please make sure to update tests as appropriate.
 
-### License
+## License
 [MIT](https://choosealicense.com/licenses/mit/)
