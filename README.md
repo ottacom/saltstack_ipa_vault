@@ -55,21 +55,120 @@ Deploy the module and distribute the GPG KEYS on every minion who is enrolled, e
 - GPG Installed (Ubuntu: apt install gnupg1 ; RockyLinux,Centos,RH: yum install gnupg, yum install gnupg1 )
 - Salt stack master installed (https://docs.saltproject.io/en/latest/topics/installation/index.html)
 - Salt stack MUST be enrolled into freeipa (minions is optional it depends for your scenario)
-- Pyarmor https://pypi.org/project/pyarmor/  - pip install pyarmor
+- Pyarmor https://pypi.org/project/pyarmor/  - pip3 install pyarmor
 
 # Installation
 
-### Install GPG 
+
+
+
+## Automatic installation
 
 ```bash
-mkdir -p /etc/salt/gpgkeys
-chmod 0700 /etc/salt/gpgkeys
-mkdir -p 
-gpg --gen-key --homedir /etc/salt/gpgkeys
+apt install gnupg1 #Ubuntu
+yum install gnupg1 #Rockylinux and friends
+pip3 install pyarmor
 
-Please follow the instructions
-!!!!REMEMBER TO SET A PASSWORD TO LOCK THE KEY!!!
+cd ~
+git clone https://github.com/ottacom/saltstack_ipa_vault
+cd saltstack_ipa_vault/installer
+./module_install.sh
 ```
+Then follow the instructions.
+In case you make some mistakes but the GPG key it has been created succesfully, you can also consider to start
+from ./module_install_2.sh avoiding to create multiple keys
+Remember to edit your /etc/salt/master as metioned by the script
+
+
+Now you should ditribuite the pillar and the module
+```bash
+salt '<name of your salt master>' saltutil.refresh_pillar
+cd /saltstack_ipa_vault/_modules
+salt '<name of your salt master>' saltutil.sync_all 
+```
+
+## For experts and deep customization
+If you have familiar whith SaltStack and modules , FreeIpa , PGP and python you can open simply create a gpg key ***protected by a password running***
+```bash
+mkdir /etc/salt/gpgkeys/
+chmod 0700 /etc/salt/gpgkeys/
+gpg1 --gen-key --homedir /etc/salt/gpgkeys/
+gpg1 --homedir /etc/salt/gpgkeys --armor --export > /etc/salt/gpgkeys/exported_pubkey.gpg
+gpg --list-keys  --homedir /etc/salt/gpgkeys
+#Please remember your GPG password 
+```
+
+The open the the file source/ipa_vault.py and configure the beginning of the file in this way then deploy and install the module in the way that you prefer.
+
+```python
+# this is a pointer to the module object instance itself.
+this = sys.modules[__name__]
+this.key="your password to unlock the the GPG key"
+this.kinit="/bin/kinit"
+this.ipa="/bin/ipa"
+this.awk="/bin/awk"
+this.gpg = gnupg.GPG(gnupghome='/etc/salt/gpgkeys')
+```
+
+Make sure that the modules is located into the directory that you prefer called "_modules" ( for example /saltstack_ipa_vault/_modules )
+
+You can create your secure pillar in the directory that you like encrypting the 3 values with GPG
+  - FreeIpa service_account
+  - FreeIpa service_password
+  - FreeIpa decryption_key
+  
+```bash
+pillar_dir="/etc/salt/secure_pillar"
+mkdir -p $pillar_dir/ipa_secrets
+echo "service_account: |" > $pillar_dir/ipa_secrets/init.sls
+echo -n $service_account | gpg1 --homedir /etc/salt/gpgkeys --armor --batch --trust-model always --encrypt -r "$key_id" >> $pillar_dir/ipa_secrets/init.sls
+echo "service_password: |" >> $pillar_dir/ipa_secrets/init.sls
+echo -n $service_password | gpg1 --homedir /etc/salt/gpgkeys --armor --batch --trust-model always --encrypt -r "$key_id" >> $pillar_dir/ipa_secrets/init.sls
+echo "decryption_key: |" >> $pillar_dir/ipa_secrets/init.sls
+echo -n $decryption_key | gpg1 --homedir /etc/salt/gpgkeys --armor --batch --trust-model always --encrypt -r "$key_id" >> $pillar_dir/ipa_secrets/init.sls
+sed -i -e 's/^/     /' /etc/salt/secure_pillar/ipa_secrets/init.sls
+sed -i -e 's/^     service_account: |/service_account: |/' /etc/salt/secure_pillar/ipa_secrets/init.sls
+sed -i -e 's/^     service_password: |/service_password: |/' /etc/salt/secure_pillar/ipa_secrets/init.sls
+sed -i -e 's/^     decryption_key: |/decryption_key: |/' /etc/salt/secure_pillar/ipa_secrets/init.sls
+cat <<EOF > $pillar_dir/top.sls
+base:
+  '*':
+      - ipa_secrets
+EOF
+```
+if everything is fine you should see a pillar file like this 
+
+```txt
+service_account: |
+     -----BEGIN PGP MESSAGE-----
+     ......
+     -----END PGP MESSAGE-----
+service_password: |
+     -----BEGIN PGP MESSAGE-----
+     ......
+     -----END PGP MESSAGE-----
+decryption_key: |
+     -----BEGIN PGP MESSAGE-----     
+     .......
+     -----END PGP MESSAGE-----
+```
+I assuming at this point that your configuration into /etc/salt/master pointing to the right section pillar_roots it should be someting like :
+
+```text
+pillar_roots:
+  base:
+    - /srv/pillar
+    - ...
+    - /etc/salt/secure_pillar/
+    - /saltstack_ipa_vault/
+```
+Now you should ditribuite the pillar and the module
+```bash
+salt '<name of your salt master>' saltutil.refresh_pillar
+cd /saltstack_ipa_vault/_modules
+salt '<name of your salt master>' saltutil.sync_all 
+```
+
 
 
 
