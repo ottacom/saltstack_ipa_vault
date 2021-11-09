@@ -80,12 +80,14 @@ from ./module_install_2.sh avoiding to create multiple keys
 Remember to edit your /etc/salt/master as metioned by the script
 
 
-Now you should ditribuite the pillar and the module
+Now you should distribuite the pillar and the module
 ```bash
 salt '<name of your salt master>' saltutil.refresh_pillar
 cd /saltstack_ipa_vault/_modules
 salt '<name of your salt master>' saltutil.sync_all 
 ```
+Then you can start to use the module follow the example int How to use it section
+
 
 ## For experts and deep customization
 If you have familiar whith SaltStack and modules , FreeIpa , PGP and python you can open simply create a gpg key ***protected by a password running***
@@ -162,13 +164,13 @@ pillar_roots:
     - /etc/salt/secure_pillar/
     - /saltstack_ipa_vault/
 ```
-Now you should ditribuite the pillar and the module
+Now you should distribuite the pillar and the module
 ```bash
 salt '<name of your salt master>' saltutil.refresh_pillar
 cd /saltstack_ipa_vault/_modules
 salt '<name of your salt master>' saltutil.sync_all 
 ```
-
+Then you can start to use the module follow the example int How to use it section
 
 
 
