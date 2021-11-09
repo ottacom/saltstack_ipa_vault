@@ -1,5 +1,11 @@
 
-![[image]({https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white}) LinkedIn](https://www.linkedin.com/in/fpans/)
+<a href="https://www.linkedin.com/in/fpans/">
+<img
+    alt="Linkedin"
+    src="https://img.shields.io/badge/linkedin-0077B5?logo=linkedin&logoColor=white&style=for-the-badge"
+/>
+</a>
+
 # Saltstack & FreeIpa Vault module integration
 ![alt text](https://github.com/ottacom/saltstack_ipa_vault/blob/main/doc/banner.drawio.png)
 
