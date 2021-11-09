@@ -52,7 +52,7 @@ Deploy the module and distribute the GPG KEYS on every minion who is enrolled, e
 ### Software Prerequisties
 - Python3 
 - FreeIpa + Vault required (https://www.freeipa.org/page/V4/Password_Vault_2.)
-- GPG Installed (Ubuntu: apt install gnupg RockyLinux,Centos,RH: yum install gnupg, yum install gnupg1 )
+- GPG Installed (Ubuntu: apt install gnupg1 ; RockyLinux,Centos,RH: yum install gnupg, yum install gnupg1 )
 - Salt stack master installed (https://docs.saltproject.io/en/latest/topics/installation/index.html)
 - Salt stack MUST be enrolled into freeipa (minions is optional it depends for your scenario)
 - Pyarmor https://pypi.org/project/pyarmor/  - pip install pyarmor
@@ -70,8 +70,7 @@ gpg --gen-key --homedir /etc/salt/gpgkeys
 Please follow the instructions
 !!!!REMEMBER TO SET A PASSWORD TO LOCK THE KEY!!!
 ```
-### Trick:
-If gpg command it dosen't work plese consider to install and use gpg1 instead
+
 
 
 
