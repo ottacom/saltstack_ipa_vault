@@ -229,7 +229,6 @@ pyarmor obfuscate ipa_vault.py
 cd dist
 mv * ../
 salt '<name of your salt master>' saltutil.clear_cache
-salt 'saltmaster.opr.ngc.dk' saltutil.clear_cache
 salt '<name of your salt master>' saltutil.sync_all
 ```
 
