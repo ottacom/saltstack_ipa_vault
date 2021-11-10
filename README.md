@@ -226,6 +226,14 @@ ipa_vault.retrieve:
      - name: ipa_vault.retrieve
      - secret: test123
 ```
+### To retrieve shared secret using state file 
+retrieve_shared.sls
+```
+ipa_vault.retrieve_shared:
+  module.run:
+     - name: ipa_vault.retrieve_shared
+     - secret: test123
+```
 
 ## Obfuscating the module (strongly reccomended)
 ```bash
