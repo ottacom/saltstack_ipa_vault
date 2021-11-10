@@ -245,10 +245,6 @@ salt '<name of your salt master>' saltutil.clear_cache
 salt '<name of your salt master>' saltutil.sync_all
 ```
 
-## Contributing
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-
-Please make sure to update tests as appropriate.
 
 
 # Referral Link
@@ -261,6 +257,11 @@ https://www.freeipa.org/page/V4/Password_Vault_2.0
 ### How to create a standard PGP integration with salt stack
 https://docs.saltproject.io/en/latest/ref/renderers/all/salt.renderers.gpg.html
 
+# Contributing
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
-## License
+Please make sure to update tests as appropriate.
+
+
+# License
 [MIT](https://choosealicense.com/licenses/mit/)
