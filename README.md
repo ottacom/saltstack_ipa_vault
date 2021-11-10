@@ -250,5 +250,17 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 
 Please make sure to update tests as appropriate.
 
+
+# Referral Link
+### How to write your custom module
+https://docs.saltproject.io/en/latest/ref/modules/index.html
+### How to install FreeIpa
+https://www.freeipa.org/page/Quick_Start_Guide
+### How to install and use FreeIpa Vault Installtion
+https://www.freeipa.org/page/V4/Password_Vault_2.0
+### How to create a standard PGP integration with salt stack
+https://docs.saltproject.io/en/latest/ref/renderers/all/salt.renderers.gpg.html
+
+
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
