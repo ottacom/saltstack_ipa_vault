@@ -252,7 +252,7 @@ salt '<name of your salt master>' saltutil.sync_all
 https://docs.saltproject.io/en/latest/ref/modules/index.html
 ### How to install FreeIpa
 https://www.freeipa.org/page/Quick_Start_Guide
-### How to install and use FreeIpa Vault Installtion
+### How to install and use FreeIpa Vault 
 https://www.freeipa.org/page/V4/Password_Vault_2.0
 ### How to create a standard PGP integration with salt stack
 https://docs.saltproject.io/en/latest/ref/renderers/all/salt.renderers.gpg.html
