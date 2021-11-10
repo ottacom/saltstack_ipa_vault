@@ -64,10 +64,8 @@ Deploy the module and distribute the GPG KEYS on every minion who is enrolled, e
 - Salt stack MUST be enrolled into freeipa (minions is optional it depends for your scenario)
 - Pyarmor https://pypi.org/project/pyarmor/  - pip3 install pyarmor
 
+
 # Installation
-
-
-
 
 ## Automatic installation
 
@@ -93,11 +91,11 @@ salt '<name of your salt master>' saltutil.refresh_pillar
 cd /saltstack_ipa_vault/_modules
 salt '<name of your salt master>' saltutil.sync_all 
 ```
-Then you can start to use the module follow the example int How to use it section
+Then you can start to use the module follow the example described into How to use it section
 
 
 ## For experts and deep customization
-If you have familiar whith SaltStack and modules , FreeIpa , PGP and python you can open simply create a gpg key ***protected by a password running***
+If you have familiar whith SaltStack and modules , FreeIpa , PGP and python you can simply create a gpg key ***protected by a password running***
 ```bash
 mkdir /etc/salt/gpgkeys/
 chmod 0700 /etc/salt/gpgkeys/
@@ -161,7 +159,7 @@ decryption_key: |
      .......
      -----END PGP MESSAGE-----
 ```
-I assuming at this point that your configuration into /etc/salt/master pointing to the right section pillar_roots it should be someting like :
+I'm assuming at this point that your configuration into /etc/salt/master is pointing to the right section pillar_roots ,so your file it should be someting like :
 
 ```text
 pillar_roots:
@@ -177,7 +175,7 @@ salt '<name of your salt master>' saltutil.refresh_pillar
 cd /saltstack_ipa_vault/_modules
 salt '<name of your salt master>' saltutil.sync_all 
 ```
-Then you can start to use the module follow the example int How to use it section
+Then you can start to use the module follow the example described into How to use it section
 
 
 
