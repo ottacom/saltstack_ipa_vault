@@ -118,6 +118,9 @@ this.gpg = gnupg.GPG(gnupghome='/etc/salt/gpgkeys')
 ```
 
 Make sure that the modules is located into the directory that you prefer called "_modules" ( for example /saltstack_ipa_vault/_modules )
+```bash
+cp /saltstack_ipa_vault/source/ipa_vault.py /saltstack_ipa_vault/_modules/
+```
 
 You can create your secure pillar in the directory that you like encrypting the 3 values with GPG
   - FreeIpa service_account
