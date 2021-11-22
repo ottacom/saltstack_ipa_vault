@@ -43,8 +43,7 @@ def retrieve_shared(secret):
                     " from freeipa vault but Kerberos credentials are invalid" )
             return ( "Invalid Kerberos credentials or user locked" )
     dec_service_account, dec_service_password, dec_decryption_key = pillars()
-    secret_retrieved=subprocess.Popen(ipa+" vault-retrieve "+secret+" --shared --password '"+dec_decryption_key+"' |grep Data | "+awk+" -F': ' '{print $2}' | base64 -d| xarg
-s", shell=True, stdout=subprocess.PIPE).stdout.read()
+    secret_retrieved=subprocess.Popen(ipa+" vault-retrieve "+secret+" --shared --password '"+dec_decryption_key+"' |grep Data | "+awk+" -F': ' '{print $2}' | base64 -d| xargs", shell=True, stdout=subprocess.PIPE).stdout.read()
     secret=(secret_retrieved.decode("utf-8"))
     if secret is None:
       syslog.syslog(syslog.LOG_INFO, "SALT-STACK -NOT-FOUND-(ipa vault module) request "+secret_requested+" but is not present\
@@ -62,8 +61,7 @@ def retrieve(secret):
                     " from freeipa vault but Kerberos credentials are invalid" )
             return ( "Invalid Kerberos credentials or user locked" )
     dec_service_account, dec_service_password, dec_decryption_key = pillars()
-    secret_retrieved=subprocess.Popen(ipa+" vault-retrieve "+secret+" --password '"+dec_decryption_key+"' |grep Data | "+awk+" -F': ' '{print $2}' | base64 -d| xargs", shell
-=True, stdout=subprocess.PIPE).stdout.read()
+    secret_retrieved=subprocess.Popen(ipa+" vault-retrieve "+secret+" --password '"+dec_decryption_key+"' |grep Data | "+awk+" -F': ' '{print $2}' | base64 -d| xargs", shell=True, stdout=subprocess.PIPE).stdout.read()
     secret=(secret_retrieved.decode("utf-8"))
     if secret is None:
       syslog.syslog(syslog.LOG_INFO, "SALT-STACK -NOT-FOUND-(ipa vault module) request "+secret_requested+" but is not present\
@@ -81,38 +79,33 @@ def store_shared(vault_name,secret,group_member,overwrite=False):
             return ( "Invalid Kerberos credentials or user locked" )
 
     dec_service_account, dec_service_password, dec_decryption_key = pillars()
-    base64=subprocess.Popen("echo '"+secret+"' |base64 -w0", shell=True, stdout=subprocess.PIPE).stdout.read()
+    base64=subprocess.Popen("echo '"+secret+"' |base64 -w 0", shell=True, stdout=subprocess.PIPE).stdout.read()
     base64=(base64.decode("utf-8"))
-    return_code=subprocess.call("echo '"+dec_decryption_key+"'|"+ipa+" vault-add "+vault_name+" --desc "+vault_name+" --shared",shell=True,stdout=subprocess.DEVNULL, stderr=
-subprocess.DEVNULL)
+    return_code=subprocess.call("echo '"+dec_decryption_key+"'|"+ipa+" vault-add "+vault_name+" --desc "+vault_name+" --shared",shell=True,stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     if return_code != 0 and overwrite==False:
             syslog.syslog(syslog.LOG_INFO, "SALT-STACK -ERROR-(ipa vault module) tried to store "+vault_name+\
                     " into freeipa vault but Kerberos credentials are invalid" )
             return ( "-ERROR- creating vault "+vault_name+" already exists?")
     if return_code != 0 and overwrite==True:
             subprocess.call(ipa+" vault-del "+vault_name+" --shared" , shell=True,stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            return_code=subprocess.call("echo '"+dec_decryption_key+"'|"+ipa+" vault-add "+vault_name+" --desc "+vault_name+" --shared",shell=True,stdout=subprocess.DEVNULL,
- stderr=subprocess.DEVNULL)
+            return_code=subprocess.call("echo '"+dec_decryption_key+"'|"+ipa+" vault-add "+vault_name+" --desc "+vault_name+" --shared",shell=True,stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     if return_code != 0:
             syslog.syslog(syslog.LOG_INFO, "SALT-STACK -ERROR-(ipa vault module) tried to store "+vault_name+ \
                     " into freeipa but something went wrong" )
             return ( "-ERROR- creating vault "+vault_name)
-    return_code=subprocess.call("echo '"+dec_decryption_key+"'|"+ipa+" vault-archive "+vault_name+" --shared --data="+base64, shell=True,stdout=subprocess.DEVNULL, stderr=su
-bprocess.DEVNULL)
+    return_code=subprocess.call("echo '"+dec_decryption_key+"'|"+ipa+" vault-archive "+vault_name+" --shared --data="+base64, shell=True,stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     if return_code != 0:
             syslog.syslog(syslog.LOG_INFO, "SALT-STACK -ERROR-(ipa vault module) tried to store "+vault_name+ \
                     " into freeipa but something went wrong" )
             return ( "-ERROR- during archiving "+vault_name )
     if group_member !="none":
-            return_code=subprocess.call(ipa+" vault-add-member --group "+group_member+" "+vault_name+" --shared",shell=True,stdout=subprocess.DEVNULL, stderr=subprocess.DEVN
-ULL)
+            return_code=subprocess.call(ipa+" vault-add-member --group "+group_member+" "+vault_name+" --shared",shell=True,stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             if return_code != 0:
                syslog.syslog(syslog.LOG_INFO, "SALT-STACK -ERROR-(ipa vault module) tried to store "+vault_name+ \
                     " into freeipa but something went wrong adding group "+group_member )
                return ( "-ERROR- adding group to "+vault_name+" is the group "+group_member+" exists?" )
-    validation_chksum=subprocess.Popen(ipa+" vault-retrieve "+vault_name+" --shared --password '"+dec_decryption_key+"' |grep Data | "+awk+" -F': ' '{print $2}'|xargs",shell
-=True, stdout=subprocess.PIPE).stdout.read()
-    validation_chksum=(validation_chksum.decode("utf-8"))
+    validation_chksum=subprocess.Popen(ipa+" vault-retrieve "+vault_name+" --shared --password '"+dec_decryption_key+"' |grep Data | "+awk+" -F': ' '{print $2}'|xargs",shell=True, stdout=subprocess.PIPE).stdout.read()
+    validation_chksum=(validation_chksum.decode("utf-8"))[:-1]
     if validation_chksum == base64:
             syslog.syslog("SALT-STACK (ipa vault module) stored and encrypted "+vault_name+" into freeipa vault")
             return( "Vault "+vault_name+" stored succesfully" )
@@ -128,31 +121,27 @@ def store(vault_name,secret,overwrite=False):
             return ( "Invalid Kerberos credentials or user locked" )
 
     dec_service_account, dec_service_password, dec_decryption_key = pillars()
-    base64=subprocess.Popen("echo '"+secret+"' |base64 -w0", shell=True, stdout=subprocess.PIPE).stdout.read()
+    base64=subprocess.Popen("echo '"+secret+"' |base64 -w 0", shell=True, stdout=subprocess.PIPE).stdout.read()
     base64=(base64.decode("utf-8"))
-    return_code=subprocess.call("echo '"+dec_decryption_key+"'|"+ipa+" vault-add "+vault_name+" --desc "+vault_name+" --shared",shell=True,stdout=subprocess.DEVNULL, stderr=
-subprocess.DEVNULL)
+    return_code=subprocess.call("echo '"+dec_decryption_key+"'|"+ipa+" vault-add "+vault_name+" --desc "+vault_name,shell=True,stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     if return_code != 0 and overwrite==False:
             syslog.syslog(syslog.LOG_INFO, "SALT-STACK -ERROR-(ipa vault module) tried to store "+vault_name+\
                     " into freeipa vault but Kerberos credentials are invalid" )
             return ( "-ERROR- creating vault "+vault_name+" already exists?")
     if return_code != 0 and overwrite==True:
-            subprocess.call(ipa+" vault-del "+vault_name+" --shared" , shell=True,stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            return_code=subprocess.call("echo '"+dec_decryption_key+"'|"+ipa+" vault-add "+vault_name+" --desc "+vault_name+" --shared",shell=True,stdout=subprocess.DEVNULL,
- stderr=subprocess.DEVNULL)
+            subprocess.call(ipa+" vault-del "+vault_name , shell=True,stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            return_code=subprocess.call("echo '"+dec_decryption_key+"'|"+ipa+" vault-add "+vault_name+" --desc "+vault_name,shell=True,stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     if return_code != 0:
             syslog.syslog(syslog.LOG_INFO, "SALT-STACK -ERROR-(ipa vault module) tried to store "+vault_name+ \
                     " into freeipa but something went wrong" )
             return ( "-ERROR- creating vault "+vault_name)
-    return_code=subprocess.call("echo '"+dec_decryption_key+"'|"+ipa+" vault-archive "+vault_name+" --shared --data="+base64, shell=True,stdout=subprocess.DEVNULL, stderr=su
-bprocess.DEVNULL)
+    return_code=subprocess.call("echo '"+dec_decryption_key+"'|"+ipa+" vault-archive "+vault_name+" --data="+base64, shell=True,stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     if return_code != 0:
             syslog.syslog(syslog.LOG_INFO, "SALT-STACK -ERROR-(ipa vault module) tried to store "+vault_name+ \
                     " into freeipa but something went wrong" )
             return ( "-ERROR- during archiving "+vault_name )
-    validation_chksum=subprocess.Popen(ipa+" vault-retrieve "+vault_name+" --password '"+dec_decryption_key+"' |grep Data | "+awk+" -F': ' '{print $2}'|xargs",shell=True, st
-dout=subprocess.PIPE).stdout.read()
-    validation_chksum=(validation_chksum.decode("utf-8"))
+    validation_chksum=subprocess.Popen(ipa+" vault-retrieve "+vault_name+" --password '"+dec_decryption_key+"' |grep Data | "+awk+" -F': ' '{print $2}'|xargs",shell=True, stdout=subprocess.PIPE).stdout.read()
+    validation_chksum=(validation_chksum.decode("utf-8"))[:-1]
     if validation_chksum == base64:
             syslog.syslog("SALT-STACK (ipa vault module) stored and encrypted "+vault_name+" into freeipa vault")
             return( "Vault "+vault_name+" stored succesfully" )
