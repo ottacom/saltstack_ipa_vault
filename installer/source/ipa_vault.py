@@ -81,7 +81,7 @@ def store_shared(vault_name,secret,group_member,overwrite=False):
             return ( "Invalid Kerberos credentials or user locked" )
 
     dec_service_account, dec_service_password, dec_decryption_key = pillars()
-    base64=subprocess.Popen("echo '"+secret+"' |base64", shell=True, stdout=subprocess.PIPE).stdout.read()
+    base64=subprocess.Popen("echo '"+secret+"' |base64 -w0", shell=True, stdout=subprocess.PIPE).stdout.read()
     base64=(base64.decode("utf-8"))
     return_code=subprocess.call("echo '"+dec_decryption_key+"'|"+ipa+" vault-add "+vault_name+" --desc "+vault_name+" --shared",shell=True,stdout=subprocess.DEVNULL, stderr=
 subprocess.DEVNULL)
@@ -128,7 +128,7 @@ def store(vault_name,secret,overwrite=False):
             return ( "Invalid Kerberos credentials or user locked" )
 
     dec_service_account, dec_service_password, dec_decryption_key = pillars()
-    base64=subprocess.Popen("echo '"+secret+"' |base64", shell=True, stdout=subprocess.PIPE).stdout.read()
+    base64=subprocess.Popen("echo '"+secret+"' |base64 -w0", shell=True, stdout=subprocess.PIPE).stdout.read()
     base64=(base64.decode("utf-8"))
     return_code=subprocess.call("echo '"+dec_decryption_key+"'|"+ipa+" vault-add "+vault_name+" --desc "+vault_name+" --shared",shell=True,stdout=subprocess.DEVNULL, stderr=
 subprocess.DEVNULL)
