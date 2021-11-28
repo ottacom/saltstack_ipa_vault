@@ -238,6 +238,14 @@ ipa_vault.retrieve_shared:
      - secret: test123
 ```
 
+### To run the state file
+```bash
+salt '<saltmaster_server>' state.apply ipa_vault.retrieve
+salt '<saltmaster_server>' state.apply ipa_vault.retrieve_shared
+salt '<saltmaster_server>' state.apply ipa_vault.rstore
+salt '<saltmaster_server>' state.apply ipa_vault.store_shared
+```
+
 ## Obfuscating the module (strongly reccomended)
 ```bash
 cd /saltstack_ipa_vault/_modules

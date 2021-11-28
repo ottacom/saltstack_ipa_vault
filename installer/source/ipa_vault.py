@@ -36,39 +36,39 @@ def aut():
     return_code = subprocess.call("echo "+dec_service_password+" | "+ kinit +" "+dec_service_account, shell=True,stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     return return_code
 
-def retrieve_shared(secret):
-    secret_requested=secret
+def retrieve_shared(vault_name):
+    vault_requested=vault_name
     if aut() != 0:
-            syslog.syslog(syslog.LOG_INFO, "SALT-STACK -ERROR-(ipa vault module) tried to decrypt "+secret_requested+\
+            syslog.syslog(syslog.LOG_INFO, "SALT-STACK -ERROR-(ipa vault module) tried to decrypt "+vault_requested+\
                     " from freeipa vault but Kerberos credentials are invalid" )
             return ( "Invalid Kerberos credentials or user locked" )
     dec_service_account, dec_service_password, dec_decryption_key = pillars()
-    secret_retrieved=subprocess.Popen(ipa+" vault-retrieve "+secret+" --shared --password '"+dec_decryption_key+"' |grep Data | "+awk+" -F': ' '{print $2}' | base64 -d| xargs", shell=True, stdout=subprocess.PIPE).stdout.read()
-    secret=(secret_retrieved.decode("utf-8"))
+    vault_retrieved=subprocess.Popen(ipa+" vault-retrieve "+vault_name+" --shared --password '"+dec_decryption_key+"' |grep Data | "+awk+" -F': ' '{print $2}' | base64 -d| xargs", shell=True, stdout=subprocess.PIPE).stdout.read()
+    secret=(vault_retrieved.decode("utf-8"))
     if secret is None:
-      syslog.syslog(syslog.LOG_INFO, "SALT-STACK -NOT-FOUND-(ipa vault module) request "+secret_requested+" but is not present\
+      syslog.syslog(syslog.LOG_INFO, "SALT-STACK -NOT-FOUND-(ipa vault module) request "+vault_requested+" but is not present\
               into freeipa vault, try with shared")
       return "not-found"
     else:
-      syslog.syslog(syslog.LOG_INFO, "SALT-STACK (ipa vault module) requested and decrypted "+secret_requested+" from freeipa vault")
+      syslog.syslog(syslog.LOG_INFO, "SALT-STACK (ipa vault module) requested and decrypted "+vault_requested+" from freeipa vault")
       return secret
 
 
-def retrieve(secret):
-    secret_requested=secret
+def retrieve(vault_name):
+    vault_requested=vault_name
     if aut() != 0:
-            syslog.syslog(syslog.LOG_INFO, "SALT-STACK -ERROR-(ipa vault module) tried to decrypt "+secret_requested+\
+            syslog.syslog(syslog.LOG_INFO, "SALT-STACK -ERROR-(ipa vault module) tried to decrypt "+vault_requested+\
                     " from freeipa vault but Kerberos credentials are invalid" )
             return ( "Invalid Kerberos credentials or user locked" )
     dec_service_account, dec_service_password, dec_decryption_key = pillars()
-    secret_retrieved=subprocess.Popen(ipa+" vault-retrieve "+secret+" --password '"+dec_decryption_key+"' |grep Data | "+awk+" -F': ' '{print $2}' | base64 -d| xargs", shell=True, stdout=subprocess.PIPE).stdout.read()
-    secret=(secret_retrieved.decode("utf-8"))
+    vault_retrieved=subprocess.Popen(ipa+" vault-retrieve "+vault_name+" --password '"+dec_decryption_key+"' |grep Data | "+awk+" -F': ' '{print $2}' | base64 -d| xargs", shell=True, stdout=subprocess.PIPE).stdout.read()
+    secret=(vault_retrieved.decode("utf-8"))
     if secret is None:
-      syslog.syslog(syslog.LOG_INFO, "SALT-STACK -NOT-FOUND-(ipa vault module) request "+secret_requested+" but is not present\
+      syslog.syslog(syslog.LOG_INFO, "SALT-STACK -NOT-FOUND-(ipa vault module) request "+vault_requested+" but is not present\
               into freeipa vault, try without shared")
       return "not-found"
     else:
-      syslog.syslog(syslog.LOG_INFO, "SALT-STACK (ipa vault module) requested and decrypted "+secret_requested+" from freeipa vault")
+      syslog.syslog(syslog.LOG_INFO, "SALT-STACK (ipa vault module) requested and decrypted "+vault_requested+" from freeipa vault")
       return secret
 
 
