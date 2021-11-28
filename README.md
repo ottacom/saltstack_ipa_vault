@@ -240,10 +240,10 @@ ipa_vault.retrieve_shared:
 
 ### To run the state file
 ```bash
-salt '<saltmaster_server>' state.apply ipa_vault.retrieve
-salt '<saltmaster_server>' state.apply ipa_vault.retrieve_shared
-salt '<saltmaster_server>' state.apply ipa_vault.rstore
-salt '<saltmaster_server>' state.apply ipa_vault.store_shared
+salt '<saltmaster_server>' state.apply <dir_of_your_statefile>.retrieve
+salt '<saltmaster_server>' state.apply <dir_of_your_statefile>.retrieve_shared
+salt '<saltmaster_server>' state.apply <dir_of_your_statefile>.store
+salt '<saltmaster_server>' state.apply <dir_of_your_statefile>.store_shared
 ```
 
 ## Obfuscating the module (strongly reccomended)
