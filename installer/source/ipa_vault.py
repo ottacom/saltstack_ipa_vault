@@ -33,7 +33,7 @@ def pillars():
 
 def aut():
     dec_service_account, dec_service_password, dec_decryption_key = pillars()
-    return_code = subprocess.call("echo "+dec_service_password+" | "+ kinit +" "+dec_service_account, shell=True,stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    return_code = subprocess.call("echo '"+dec_service_password+"' | "+ kinit +" "+dec_service_account, shell=True,stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     return return_code
 
 def retrieve_shared(vault_name):

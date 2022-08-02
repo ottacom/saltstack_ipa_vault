@@ -89,7 +89,7 @@ Now you should distribuite the pillar and the module
 ```bash
 salt '<name of your salt master>' saltutil.refresh_pillar
 cd /saltstack_ipa_vault/_modules
-salt '<name of your salt master>' saltutil.sync_all 
+salt '<name of your salt master>' saltutil.sync_all saltenv=base
 ```
 Then you can start to use the module follow the example described into How to use it section
 
