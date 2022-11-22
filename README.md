@@ -129,6 +129,7 @@ You can create your secure pillar in the directory that you like encrypting the 
   
 ```bash
 pillar_dir="/etc/salt/secure_pillar"
+key_id="your favourite gpg key name"
 mkdir -p $pillar_dir/ipa_secrets
 echo "service_account: |" > $pillar_dir/ipa_secrets/init.sls
 echo -n $service_account | gpg1 --homedir /etc/salt/gpgkeys --armor --batch --trust-model always --encrypt -r "$key_id" >> $pillar_dir/ipa_secrets/init.sls
