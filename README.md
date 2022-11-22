@@ -132,15 +132,15 @@ pillar_dir="/etc/salt/secure_pillar"
 key_id="your favourite gpg key name"
 mkdir -p $pillar_dir/ipa_secrets
 echo "service_account: |" > $pillar_dir/ipa_secrets/init.sls
-echo -n $service_account | gpg1 --homedir /etc/salt/gpgkeys --armor --batch --trust-model always --encrypt -r "$key_id" >> $pillar_dir/ipa_secrets/init.sls
+echo -n $service_account | gpg2 --homedir /etc/salt/gpgkeys --armor --batch --trust-model always --encrypt -r "$key_id" >> $pillar_dir/ipa_secrets/init.sls
 echo "service_password: |" >> $pillar_dir/ipa_secrets/init.sls
-echo -n $service_password | gpg1 --homedir /etc/salt/gpgkeys --armor --batch --trust-model always --encrypt -r "$key_id" >> $pillar_dir/ipa_secrets/init.sls
+echo -n $service_password | gpg2 --homedir /etc/salt/gpgkeys --armor --batch --trust-model always --encrypt -r "$key_id" >> $pillar_dir/ipa_secrets/init.sls
 echo "decryption_key: |" >> $pillar_dir/ipa_secrets/init.sls
-echo -n $decryption_key | gpg1 --homedir /etc/salt/gpgkeys --armor --batch --trust-model always --encrypt -r "$key_id" >> $pillar_dir/ipa_secrets/init.sls
-sed -i -e 's/^/     /' /etc/salt/secure_pillar/ipa_secrets/init.sls
-sed -i -e 's/^     service_account: |/service_account: |/' /etc/salt/secure_pillar/ipa_secrets/init.sls
-sed -i -e 's/^     service_password: |/service_password: |/' /etc/salt/secure_pillar/ipa_secrets/init.sls
-sed -i -e 's/^     decryption_key: |/decryption_key: |/' /etc/salt/secure_pillar/ipa_secrets/init.sls
+echo -n $decryption_key | gpg2 --homedir /etc/salt/gpgkeys --armor --batch --trust-model always --encrypt -r "$key_id" >> $pillar_dir/ipa_secrets/init.sls
+sed -i -e 's/^/     /' $pillar_dir//ipa_secrets/init.sls
+sed -i -e 's/^     service_account: |/service_account: |/' $pillar_dir/ipa_secrets/init.sls
+sed -i -e 's/^     service_password: |/service_password: |/' $pillar_dir/ipa_secrets/init.sls
+sed -i -e 's/^     decryption_key: |/decryption_key: |/' $pillar_dir/ipa_secrets/init.sls
 cat <<EOF > $pillar_dir/top.sls
 base:
   '*':
