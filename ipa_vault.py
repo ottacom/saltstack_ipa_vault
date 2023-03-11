@@ -6,15 +6,15 @@ import syslog
 
 # this is a pointer to the module object instance itself.
 this = sys.modules[__name__]
-this.key="to_sub_gpg_password"
-this.kinit="to_sub_kinit"
-this.ipa="to_sub_ipa"
-this.awk="to_sub_awk"i
-this.gpg_home='to_sub_gpg_home'
-this.pillar_service_account="service_account"
-this.pillar_service_password="service_password"
-this.pillar_decryption_key="decryption_key"
-
+this.key="+jz#eZydx5fHa,-d3dH"
+this.kinit="/bin/kinit"
+this.ipa="/bin/ipa"
+this.awk="/bin/awk"
+this.gpg="/bin/gpg"
+this.gpg_home='/etc/salt/gpgkeys'
+this.pillar_service_account="/etc/salt/ipa/service_account"
+this.pillar_service_password="/etc/salt/ipa/service_password"
+this.pillar_decryption_key="/etc/salt/ipa/decryption_key"
 
 def pillars():
     dec_service_account=subprocess.Popen(gpg+" --pinentry-mode=loopback --passphrase '"+key+"' --quiet --homedir '"+gpg_home+"' --decrypt "+pillar_service_account,bufsize=-1,close_fds=True, shell=True, stdout=subprocess.PIPE).stdout.read()
