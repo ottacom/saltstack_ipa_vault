@@ -93,6 +93,7 @@ cp ./source/ipa_vault.py ipa_vault.py
 sed -i -e "s/to_sub_kinit/${kinit//\//\\/}/" ipa_vault.py
 sed -i -e "s/to_sub_ipa/${ipa//\//\\/}/" ipa_vault.py
 sed -i -e "s/to_sub_awk/${awk//\//\\/}/" ipa_vault.py
+sed -i -e "s/to_sub_gpg/${gpg//\//\\/}/" ipa_vault.py
 sed -i -e "s/to_sub_gpg_home/${gpg_dir//\//\\/}/" ipa_vault.py
 sed -i -e "s/to_sub_gpg_password/${gpg_password_key//\//\\/}/" ipa_vault.py
 
