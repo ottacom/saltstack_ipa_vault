@@ -1,151 +1,121 @@
-#!/usr/bin/python3
-import os
-import subprocess
-import sys
-import syslog
+#!/bin/bash
+echo "Configuring the env"
 
-# this is a pointer to the module object instance itself.
-this = sys.modules[__name__]
-this.key="to_sub_gpg_password"
-this.kinit="to_sub_kinit"
-this.ipa="to_sub_ipa"
-this.awk="to_sub_awk"
-this.gpg="to_sub_gpg"
-this.gpg_home='to_sub_gpg_home'
-this.pillar_service_account="service_account"
-this.pillar_service_password="service_password"
-this.pillar_decryption_key="decryption_key"
+if [ -z ${1+x} ]; then
+	echo "Please enter the directory where keys are (default: /etc/salt/gpgkeys): "
+	read gpg_dir
+	gpg_dir="${gpg_dir:=/etc/salt/gpgkeys}"
+else
+	gpg_dir=$1
+fi
+echo "Please enter the directory where keys are (default: /saltstack_ipa_vault/_modules: "
+read modules_dir
+echo -n "Please enter the FreeIpa service accout that you want to use for: "
+read service_account
+echo -n "Please enter the password for that FreeIpa account: "
+read -s service_password
+echo -n "Please enter the password to encrypt/decrypt the secrets into FreeIpa vault: "
+read -s decryption_key
+echo -n "Please enter the password to unlock the GPG KEY : "
+read -s gpg_password_key
+echo -n "Please enter the directory where you want to store your secure pillar (default: /etc/salt/secure_pillar): "
+read pillar_dir
 
+echo "Your GPG key should be into this list"
+echo "----"
+gpg1 --homedir $gpg_dir --list-keys | grep uid |awk '{print $2}'
+echo "----"
+echo "Please enter the key that you want to use for free ipa module: "
+read key_id
+echo "Running a test"
+echo -n "THIS IS A TEST" | gpg1 --homedir /etc/salt/gpgkeys --armor --batch --trust-model always --encrypt -r "$key_id" > /tmp/test.pgp
+secret=$( echo -n $gpg_password_key |gpg1 --passphrase-fd 0 --batch --quiet --homedir $gpg_dir --decrypt /tmp/test.pgp)
+if [ "$secret" = "THIS IS A TEST" ]; then
+    echo
+    echo "GPG TEST PASSED!"
+else
+    echo
+    echo "Something went wrong during gpg test"
+    exit 1
+fi
 
-def pillars():
-    dec_service_account=subprocess.Popen(gpg+" --pinentry-mode=loopback --passphrase '"+key+"' --quiet --homedir '"+gpg_home+"' --decrypt "+pillar_service_account,bufsize=-1,close_fds=True, shell=True, stdout=subprocess.PIPE).stdout.read()
-    dec_service_password=subprocess.Popen(gpg+" --pinentry-mode=loopback --passphrase '"+key+"' --quiet --homedir '"+gpg_home+"' --decrypt "+pillar_service_password,bufsize=-1,close_fds=True, shell=True, stdout=subprocess.PIPE).stdout.read()
-    dec_decryption_key=subprocess.Popen(gpg+" --pinentry-mode=loopback --passphrase '"+key+"' --quiet --homedir '"+gpg_home+"' --decrypt "+pillar_decryption_key,close_fds=True,bufsize=-1, shell=True, stdout=subprocess.PIPE).stdout.read()
-    dec_service_account=dec_service_account.decode("utf-8")
-    dec_service_password=dec_service_password.decode("utf-8")
-    dec_decryption_key=dec_decryption_key.decode("utf-8")
-    if (dec_service_account is None )  or (dec_service_password is None)  or (dec_decryption_key is None):
-          syslog.syslog(syslog.LOG_INFO, "SALT-STACK -ERROR-(ipa vault module) invalid GPG key-ID , wrong password or something else realted with GPG")
-          return ( "Invalid GPG key-ID , wrong password or something else realted with GPG" )
-    else:
-          return dec_service_account,dec_service_password,dec_decryption_key
+gpg1 --homedir /etc/salt/gpgkeys --armor --export > /etc/salt/gpgkeys/exported_pubkey.gpg
 
-def aut():
-    dec_service_account, dec_service_password, dec_decryption_key = pillars()
-    return_code = subprocess.call("echo -n '"+dec_service_password+"' |  kinit "+dec_service_account+" >/dev/null 2>&1 ",close_fds=True,bufsize=-1, shell=True,stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    return return_code
+pillar_dir="${pillar_dir:=/etc/salt/secure_pillar}"
+modules_dir="${modules_dir:=/saltstack_ipa_vault/_modules}"
+secret_dir="/etc/salt/ipa"
+echo "Creating directory $pillar_dir"
+mkdir -p $pillar_dir/ipa_secrets
+chmod 0600 -R $pillar_dir
 
-def retrieve_shared(vault_name):
-    vault_requested=vault_name
-    if aut() != 0:
-            syslog.syslog(syslog.LOG_INFO, "SALT-STACK -ERROR-(ipa vault module) tried to decrypt "+vault_requested+\
-                    " from freeipa vault but Kerberos credentials are invalid" )
-            return ( "Invalid Kerberos credentials or user locked" )
-    dec_service_account, dec_service_password, dec_decryption_key = pillars()
-    vault_retrieved=subprocess.Popen(ipa+" vault-retrieve "+vault_name+" --shared --password '"+dec_decryption_key+"' |grep Data | "+awk+" -F': ' '{print $2}' | base64 -d| xargs",close_fds=True,bufsize=-1, shell=True, stdout=subprocess.PIPE).stdout.read()
-    secret=(vault_retrieved.decode("utf-8"))
-    if secret is None:
-      syslog.syslog(syslog.LOG_INFO, "SALT-STACK -NOT-FOUND-(ipa vault module) request "+vault_requested+" but is not present\
-              into freeipa vault, try with shared")
-      return "not-found"
-    else:
-      syslog.syslog(syslog.LOG_INFO, "SALT-STACK (ipa vault module) requested and decrypted "+vault_requested+" from freeipa vault")
-      return secret.strip()
-
-
-def retrieve(vault_name):
-    vault_requested=vault_name
-    if aut() != 0:
-            syslog.syslog(syslog.LOG_INFO, "SALT-STACK -ERROR-(ipa vault module) tried to decrypt "+vault_requested+\
-                    " from freeipa vault but Kerberos credentials are invalid" )
-            return ( "Invalid Kerberos credentials or user locked" )
-    dec_service_account, dec_service_password, dec_decryption_key = pillars()
-    vault_retrieved=subprocess.Popen(ipa+" vault-retrieve "+vault_name+" --password '"+dec_decryption_key+"' |grep Data | "+awk+" -F': ' '{print $2}' | base64 -d| xargs",bufsize=-1,close_fds=True, shell=True, stdout=subprocess.PIPE).stdout.read()
-    secret=(vault_retrieved.decode("utf-8"))
-    if secret is None:
-      syslog.syslog(syslog.LOG_INFO, "SALT-STACK -NOT-FOUND-(ipa vault module) request "+vault_requested+" but is not present\
-              into freeipa vault, try without shared")
-      return "not-found"
-    else:
-      syslog.syslog(syslog.LOG_INFO, "SALT-STACK (ipa vault module) requested and decrypted "+vault_requested+" from freeipa vault")
-      return secret.strip()
+echo "Creating directory $modules_dir"
+mkdir -p $modules_dir/_modules
+chmod 0700 -R $modules_dir
 
 
-def store_shared(vault_name,secret,group_member,overwrite=False):
-    if aut() != 0:
-            syslog.syslog(syslog.LOG_INFO, "SALT-STACK -ERROR-(ipa vault module) tried to store "+vault_name+ \
-                    " from freeipa vault but Kerberos credentials are invalid" )
-            return ( "Invalid Kerberos credentials or user locked" )
+echo "Running Kerberos test authentication"
+if ! echo -n $service_password |kinit $service_account > /dev/null; then
+    echo "Password problem or maybe $service_account doesn't exist in FreeIpa"
+    exit 1
+else
+    echo "Kerberos test passed!!"
+fi
 
-    dec_service_account, dec_service_password, dec_decryption_key = pillars()
-    secret=secret.strip()
-    base64=subprocess.Popen("echo -n '"+secret+"' |base64 -w 0", shell=True, stdout=subprocess.PIPE).stdout.read()
-    base64=(base64.decode("utf-8"))
-    return_code=subprocess.call("echo -n '"+dec_decryption_key+"'|"+ipa+" vault-add "+vault_name+" --desc "+vault_name+" --shared",shell=True,stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    if return_code != 0 and overwrite==False:
-            syslog.syslog(syslog.LOG_INFO, "SALT-STACK -ERROR-(ipa vault module) tried to store "+vault_name+\
-                    " into freeipa vault but Kerberos credentials are invalid" )
-            return ( "-ERROR- creating vault "+vault_name+" already exists?")
-    if return_code != 0 and overwrite==True:
-            subprocess.call(ipa+" vault-del "+vault_name+" --shared" , shell=True,stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            return_code=subprocess.call("echo -n '"+dec_decryption_key+"'|"+ipa+" vault-add "+vault_name+" --desc "+vault_name+" --shared",close_fds=True,bufsize=-1,shell=True,stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    if return_code != 0:
-            syslog.syslog(syslog.LOG_INFO, "SALT-STACK -ERROR-(ipa vault module) tried to store "+vault_name+ \
-                    " into freeipa but something went wrong" )
-            return ( "-ERROR- creating vault "+vault_name)
-    return_code=subprocess.call("echo -n '"+dec_decryption_key+"'|"+ipa+" vault-archive "+vault_name+" --shared --data="+base64, close_fds=True,bufsize=-1,shell=True,stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    if return_code != 0:
-            syslog.syslog(syslog.LOG_INFO, "SALT-STACK -ERROR-(ipa vault module) tried to store "+vault_name+ \
-                    " into freeipa but something went wrong" )
-            return ( "-ERROR- during archiving "+vault_name )
-    if group_member !="none":
-            return_code=subprocess.call(ipa+" vault-add-member --group "+group_member+" "+vault_name+" --shared",shell=True,close_fds=True,bufsize=-1,stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            if return_code != 0:
-               syslog.syslog(syslog.LOG_INFO, "SALT-STACK -ERROR-(ipa vault module) tried to store "+vault_name+ \
-                    " into freeipa but something went wrong adding group "+group_member )
-               return ( "-ERROR- adding group to "+vault_name+" is the group "+group_member+" exists?" )
-    validation_chksum=subprocess.Popen(ipa+" vault-retrieve "+vault_name+" --shared --password '"+dec_decryption_key+"' |grep Data | "+awk+" -F': ' '{print $2}'|xargs",shell=True, stdout=subprocess.PIPE).stdout.read()
-    validation_chksum=(validation_chksum.decode("utf-8"))[:-1]
-    if validation_chksum == base64:
-            syslog.syslog("SALT-STACK (ipa vault module) stored and encrypted "+vault_name+" into freeipa vault")
-            return( "Vault "+vault_name+" stored succesfully" )
-    else:
-            syslog.syslog(syslog.LOG_INFO, "SALT-STACK -ERROR-(ipa vault module) tried to store "+vault_name+ \
-                    " into freeipa but something went wrong during the validation" )
-            return ( "Encryption/Decryption -ERROR- on "+vault_name )
+mkdir $secret_dir
 
-def store(vault_name,secret,overwrite=False):
-    if aut() != 0:
-            syslog.syslog(syslog.LOG_INFO, "SALT-STACK -ERROR-(ipa vault module) tried to store "+vault_name +\
-                    " from freeipa vault but Kerberos credentials are invalid" )
-            return ( "Invalid Kerberos credentials or user locked" )
-    secret=secret.strip()
-    dec_service_account, dec_service_password, dec_decryption_key = pillars()
-    base64=subprocess.Popen("echo -n '"+secret+"' |base64 -w 0", shell=True, stdout=subprocess.PIPE).stdout.read()
-    base64=(base64.decode("utf-8"))
-    return_code=subprocess.call("echo -n '"+dec_decryption_key+"'|"+ipa+" vault-add "+vault_name+" --desc "+vault_name,shell=True,stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    if return_code != 0 and overwrite==False:
-            syslog.syslog(syslog.LOG_INFO, "SALT-STACK -ERROR-(ipa vault module) tried to store "+vault_name+\
-                    " into freeipa vault but Kerberos credentials are invalid" )
-            return ( "-ERROR- creating vault "+vault_name+" already exists?")
-    if return_code != 0 and overwrite==True:
-            subprocess.call(ipa+" vault-del "+vault_name , shell=True,stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            return_code=subprocess.call("echo -n '"+dec_decryption_key+"'|"+ipa+" vault-add "+vault_name+" --desc "+vault_name,close_fds=True,bufsize=-1,shell=True,stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    if return_code != 0:
-            syslog.syslog(syslog.LOG_INFO, "SALT-STACK -ERROR-(ipa vault module) tried to store "+vault_name+ \
-                    " into freeipa but something went wrong" )
-            return ( "-ERROR- creating vault "+vault_name)
-    return_code=subprocess.call("echo -n '"+dec_decryption_key+"'|"+ipa+" vault-archive "+vault_name+" --data="+base64,close_fds=True,bufsize=-1, shell=True,stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    if return_code != 0:
-            syslog.syslog(syslog.LOG_INFO, "SALT-STACK -ERROR-(ipa vault module) tried to store "+vault_name+ \
-                    " into freeipa but something went wrong" )
-            return ( "-ERROR- during archiving "+vault_name )
-    validation_chksum=subprocess.Popen(ipa+" vault-retrieve "+vault_name+" --password '"+dec_decryption_key+"' |grep Data | "+awk+" -F': ' '{print $2}'|xargs",shell=True, stdout=subprocess.PIPE).stdout.read()
-    validation_chksum=(validation_chksum.decode("utf-8"))[:-1]
-    if validation_chksum == base64:
-            syslog.syslog("SALT-STACK (ipa vault module) stored and encrypted "+vault_name+" into freeipa vault")
-            return( "Vault "+vault_name+" stored succesfully" )
-    else:
-            syslog.syslog(syslog.LOG_INFO, "SALT-STACK -ERROR-(ipa vault module) tried to store "+vault_name+ \
-                    " into freeipa but something went wrong during the validation" )
-            return ( "Encryption/Decryption -ERROR- on "+vault_name )
+echo "service_account: |" > $pillar_dir/ipa_secrets/init.sls
+sa=$(echo -n $service_account | gpg1 --homedir /etc/salt/gpgkeys --armor --batch --trust-model always --encrypt -r "$key_id")
+echo $sa >> $pillar_dir/ipa_secrets/init.sls
+echo $sa > $secret_dir/service_account
+
+echo "service_password: |" >> $pillar_dir/ipa_secrets/init.sls
+sp=$(echo -n $service_password | gpg1 --homedir /etc/salt/gpgkeys --armor --batch --trust-model always --encrypt -r "$key_id")
+echo $sp >> $pillar_dir/ipa_secrets/init.sls
+echo $sp > $secret_dir/service_password
+
+echo "decryption_key: |" >> $pillar_dir/ipa_secrets/init.sls
+dk=$(echo -n $decryption_key | gpg1 --homedir /etc/salt/gpgkeys --armor --batch --trust-model always --encrypt -r "$key_id")
+echo $dk >> $pillar_dir/ipa_secrets/init.sls
+echo $dk > $secret_dir/decryption_key
+#Formatting the file
+sed -i -e 's/^/     /' /etc/salt/secure_pillar/ipa_secrets/init.sls
+sed -i -e 's/^     service_account: |/service_account: |/' /etc/salt/secure_pillar/ipa_secrets/init.sls
+sed -i -e 's/^     service_password: |/service_password: |/' /etc/salt/secure_pillar/ipa_secrets/init.sls
+sed -i -e 's/^     decryption_key: |/decryption_key: |/' /etc/salt/secure_pillar/ipa_secrets/init.sls
+cat <<EOF > $pillar_dir/top.sls
+base:
+  '*':
+      - ipa_secrets
+EOF
+
+
+kinit=$(which kinit)
+ipa=$(which ipa)
+awk=$(which awk)
+gpg1=$(which gpg1)
+pyarmor=$(which pyarmor)
+echo "Configuring the module..."
+cp ./source/ipa_vault.py ipa_vault.py
+
+#sed -i -e "s/to_sub_gpg_password/${gpg_password_key//\\/\\\\}/" ipa_vault.py
+#sed -i -e "s/to_sub_kinit/${kinit//\//\\/}/" ipa_vault.py
+
+
+sed -i -e "s/to_sub_kinit/${kinit//\//\\/}/" ipa_vault.py
+sed -i -e "s/to_sub_ipa/${ipa//\//\\/}/" ipa_vault.py
+sed -i -e "s/to_sub_awk/${awk//\//\\/}/" ipa_vault.py
+sed -i -e "s/to_sub_gpg/${gpg//\//\\/}/" ipa_vault.py
+sed -i -e "s/to_sub_gpg_home/${gpg_dir//\//\\/}/" ipa_vault.py
+sed -i -e "s/to_sub_gpg_password/${gpg_password_key//\//\\/}/" ipa_vault.py
+
+mv ipa_vault.py $modules_dir
+
+echo "Please open the conf file /etc/salt/master and add this entries under pillar_roots area following the example below"
+echo "pillar_roots:"
+echo "  base:"
+echo "    - /srv/pillar"
+echo "    - ..."
+echo "    - $pillar_dir"
+echo "    - $modules_dir"
+
+echo "Then restart salt master"
