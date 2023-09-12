@@ -10,6 +10,7 @@ this.key="to_sub_gpg_password"
 this.kinit="to_sub_kinit"
 this.ipa="to_sub_ipa"
 this.awk="to_sub_awk"
+this.gpg="to_sub_gpg"
 this.gpg_home='to_sub_gpg_home'
 this.pillar_service_account="service_account"
 this.pillar_service_password="service_password"
