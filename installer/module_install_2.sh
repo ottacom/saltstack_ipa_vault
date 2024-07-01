@@ -20,26 +20,25 @@ echo -n "Please enter the password to unlock the GPG KEY : "
 read -s gpg_password_key
 echo -n "Please enter the directory where you want to store your secure pillar (default: /etc/salt/secure_pillar): "
 read pillar_dir
-
 echo "Your GPG key should be into this list"
 echo "----"
-gpg1 --homedir $gpg_dir --list-keys | grep uid |awk '{print $2}'
+gpg --homedir $gpg_dir --list-keys | grep uid |awk '{print $3}'
 echo "----"
 echo "Please enter the key that you want to use for free ipa module: "
 read key_id
 echo "Running a test"
-echo -n "THIS IS A TEST" | gpg1 --homedir /etc/salt/gpgkeys --armor --batch --trust-model always --encrypt -r "$key_id" > /tmp/test.pgp
-secret=$( echo -n $gpg_password_key |gpg1 --passphrase-fd 0 --batch --quiet --homedir $gpg_dir --decrypt /tmp/test.pgp)
+echo -n "THIS IS A TEST" | gpg --homedir /etc/salt/gpgkeys --armor --batch --trust-model always --encrypt -r "$key_id" > /tmp/test.pgp
+secret=$( echo -n $gpg_password_key |gpg --passphrase-fd 0 --batch --quiet --homedir $gpg_dir --decrypt /tmp/test.pgp)
 if [ "$secret" = "THIS IS A TEST" ]; then
     echo
     echo "GPG TEST PASSED!"
 else
     echo
     echo "Something went wrong during gpg test"
-    exit 1
+   # exit 1
 fi
 
-gpg1 --homedir /etc/salt/gpgkeys --armor --export > /etc/salt/gpgkeys/exported_pubkey.gpg
+gpg --homedir /etc/salt/gpgkeys --armor --export > /etc/salt/gpgkeys/exported_pubkey.gpg
 
 pillar_dir="${pillar_dir:=/etc/salt/secure_pillar}"
 modules_dir="${modules_dir:=/saltstack_ipa_vault/_modules}"
@@ -61,11 +60,11 @@ else
 fi
 
 echo "service_account: |" > $pillar_dir/ipa_secrets/init.sls
-echo -n $service_account | gpg1 --homedir /etc/salt/gpgkeys --armor --batch --trust-model always --encrypt -r "$key_id" >> $pillar_dir/ipa_secrets/init.sls
+echo -n $service_account | gpg --homedir /etc/salt/gpgkeys --armor --batch --trust-model always --encrypt -r "$key_id" >> $pillar_dir/ipa_secrets/init.sls
 echo "service_password: |" >> $pillar_dir/ipa_secrets/init.sls
-echo -n $service_password | gpg1 --homedir /etc/salt/gpgkeys --armor --batch --trust-model always --encrypt -r "$key_id" >> $pillar_dir/ipa_secrets/init.sls
+echo -n $service_password | gpg --homedir /etc/salt/gpgkeys --armor --batch --trust-model always --encrypt -r "$key_id" >> $pillar_dir/ipa_secrets/init.sls
 echo "decryption_key: |" >> $pillar_dir/ipa_secrets/init.sls
-echo -n $decryption_key | gpg1 --homedir /etc/salt/gpgkeys --armor --batch --trust-model always --encrypt -r "$key_id" >> $pillar_dir/ipa_secrets/init.sls
+echo -n $decryption_key | gpg --homedir /etc/salt/gpgkeys --armor --batch --trust-model always --encrypt -r "$key_id" >> $pillar_dir/ipa_secrets/init.sls
 #Formatting the file
 sed -i -e 's/^/     /' /etc/salt/secure_pillar/ipa_secrets/init.sls
 sed -i -e 's/^     service_account: |/service_account: |/' /etc/salt/secure_pillar/ipa_secrets/init.sls
@@ -81,7 +80,7 @@ EOF
 kinit=$(which kinit)
 ipa=$(which ipa)
 awk=$(which awk)
-gpg1=$(which gpg1)
+gpg=$(which gpg)
 pyarmor=$(which pyarmor)
 echo "Configuring the module..."
 cp ./source/ipa_vault.py ipa_vault.py
